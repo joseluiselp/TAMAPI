@@ -5,6 +5,7 @@ import org.agile.monkeys.msvc.java.api.users.msvcjavaapiusers.models.dto.*;
 import org.agile.monkeys.msvc.java.api.users.msvcjavaapiusers.models.entity.User;
 import org.agile.monkeys.msvc.java.api.users.msvcjavaapiusers.repositories.UserRepository;
 import org.agile.monkeys.msvc.java.api.users.msvcjavaapiusers.services.CustomUserDetailsService;
+import org.agile.monkeys.msvc.java.api.users.msvcjavaapiusers.services.UserService;
 import org.agile.monkeys.msvc.java.api.users.msvcjavaapiusers.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -38,11 +40,11 @@ public class AuthController {
     JwtUtil jwtUtil;
 
     @Autowired
-    UserRepository userRepository;
+    private UserService service;
 
 
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody User user) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody UserRequest user) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -60,19 +62,14 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-
-
-        if(userRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
-            return new ResponseEntity(new ApiResponse(false, "Email Address already in use!"),
-                    HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> createUser() {
+        if(service.findByEmail("admin@email.com").isPresent()) {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Admin admin@email.com already exists!"));
         }
-
-        // Creating user's account
-        User jwtUser = new User();
-        jwtUser.setEmail(signUpRequest.getEmail());
-        jwtUser.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
-        userRepository.save(jwtUser);
-        return ResponseEntity.ok(new ApiResponse(true, "User registered successfully"));
+        User newUser = new User();
+        newUser.setEmail("admin@email.com");
+        newUser.setPassword(passwordEncoder.encode("password"));
+        newUser.setIsAdmin(true);
+        return ResponseEntity.ok(service.save(newUser));
     }
 }
