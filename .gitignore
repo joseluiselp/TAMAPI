@@ -2,6 +2,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+/tam-java-api/src/main/resources/javaapitest-354702-391841e40081.json
 
 ### IntelliJ IDEA ###
 .idea/*
