@@ -7,11 +7,11 @@
 		<artifactId>backend_api</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
-	<groupId>org.agile.monkeys.msvc.java.api.users</groupId>
-	<artifactId>msvc-java-api-users</artifactId>
+	<groupId>org.agile.monkeys.java.api</groupId>
+	<artifactId>tam-java-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>msvc-java-api-users</name>
-	<description>Microservice Users</description>
+	<name>tam-java-api</name>
+	<description>TAMAPI</description>
 	<properties>
 		<java.version>11</java.version>
 		<spring-cloud.version>2021.0.3</spring-cloud.version>

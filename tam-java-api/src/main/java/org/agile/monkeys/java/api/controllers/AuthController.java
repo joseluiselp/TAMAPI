@@ -8,7 +8,6 @@ import org.agile.monkeys.java.api.models.entity.User;
 import org.agile.monkeys.java.api.services.CustomUserDetailsService;
 import org.agile.monkeys.java.api.services.UserService;
 import org.agile.monkeys.java.api.util.JwtUtil;
-import org.agile.monkeys.msvc.java.api.users.msvcjavaapiusers.models.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
