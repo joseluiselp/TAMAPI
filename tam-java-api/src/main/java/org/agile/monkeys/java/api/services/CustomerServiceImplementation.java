@@ -27,7 +27,7 @@ public class CustomerServiceImplementation implements CustomerService {
     static {
         try {
             ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            InputStream is = classloader.getResourceAsStream("javaapitest-354702-073b90b2d02c.json");
+            InputStream is = classloader.getResourceAsStream("javaapitest-354702-391841e40081.json");
             credentials = GoogleCredentials
                     .fromStream(is);
         } catch (IOException e) {
