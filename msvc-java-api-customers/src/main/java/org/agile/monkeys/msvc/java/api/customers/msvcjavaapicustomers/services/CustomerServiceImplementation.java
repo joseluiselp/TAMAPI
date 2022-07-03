@@ -13,12 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +28,7 @@ public class CustomerServiceImplementation implements CustomerService {
     static {
         try {
             ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            InputStream is = classloader.getResourceAsStream("javaapitest-354702-be290c1381f9.json");
+            InputStream is = classloader.getResourceAsStream("javaapitest-354702-073b90b2d02c.json");
             credentials = GoogleCredentials
                     .fromStream(is);
         } catch (IOException e) {
@@ -42,7 +38,6 @@ public class CustomerServiceImplementation implements CustomerService {
 
     private static final Storage storage = StorageOptions.newBuilder().setCredentials(credentials)
             .setProjectId("javaapitest-354702").build().getService();
-    //private static Storage storage = StorageOptions.getDefaultInstance().getService();
 
     public CustomerServiceImplementation() throws IOException {
     }
@@ -72,11 +67,11 @@ public class CustomerServiceImplementation implements CustomerService {
         System.out.println(storage.toString());
         try {
             BlobInfo blobInfo = storage.create(
-                    BlobInfo.newBuilder("photos_tam", file.getOriginalFilename()).build(), //get original file name
-                    file.getBytes(), // the file
-                    Storage.BlobTargetOption.predefinedAcl(Storage.PredefinedAcl.PUBLIC_READ) // Set file permission
+                    BlobInfo.newBuilder("photos_tam", file.getOriginalFilename()).build(),
+                    file.getBytes(),
+                    Storage.BlobTargetOption.predefinedAcl(Storage.PredefinedAcl.PUBLIC_READ)
             );
-            return blobInfo.getMediaLink(); // Return file url
+            return blobInfo.getMediaLink();
         }catch(IllegalStateException e){
             throw new RuntimeException(e);
         } catch (IOException e) {

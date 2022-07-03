@@ -1,5 +1,7 @@
 package org.agile.monkeys.msvc.java.api.customers.msvcjavaapicustomers.controllers;
 
+import org.agile.monkeys.msvc.java.api.customers.msvcjavaapicustomers.models.dto.ApiResponse;
+import org.agile.monkeys.msvc.java.api.customers.msvcjavaapicustomers.models.dto.CustomerUpdateRequest;
 import org.agile.monkeys.msvc.java.api.customers.msvcjavaapicustomers.models.entity.Customer;
 import org.agile.monkeys.msvc.java.api.customers.msvcjavaapicustomers.services.CustomerService;
 import org.slf4j.Logger;
@@ -40,51 +42,55 @@ public class CustomerController {
         if(!customer.isEmpty()){
             return ResponseEntity.ok(customer.get());
         }
-        return ResponseEntity.notFound().build();
-    }
-
-    @PostMapping("/upload")
-    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file){
-        logger.error("file",file.getOriginalFilename());
-        try{
-            file.transferTo(new File("C:\\Users\\elbeb\\Documents\\Among.Us.v2020.9.1s\\test.JPG"));
-        }
-        catch (Exception e){
-            logger.warn("Photo not saved "+e.getCause());
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(false, "Customer not found!"));
     }
 
     @PostMapping
-    public ResponseEntity<?> createCustomer(@RequestParam("file") MultipartFile file,
+    public ResponseEntity<?> createCustomer(@RequestParam("file") Optional<MultipartFile> file,
                                             @Valid @ModelAttribute Customer customer, BindingResult result){
         if(result.hasErrors()){
             return validateRequest(result);
         }
         try{
-
-            service.savePhoto(file);
+            Customer newCustomer = new Customer();
+            if(file.isPresent())
+                newCustomer.setPhotoUrl(service.savePhoto(file.get()));
+            newCustomer.setName(customer.getName());
+            newCustomer.setSurname(customer.getSurname());
+            newCustomer.setCreatedBy(customer.getCreatedBy());
+            newCustomer.setUpdatedBy(customer.getUpdatedBy());
+            return ResponseEntity.status(HttpStatus.CREATED).body(service.save(newCustomer));
         }
         catch (Exception e){
-            logger.warn("Photo not saved "+e.getCause());
+            // maybe put sentry here
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Exception "+e.getMessage()));
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(customer));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@Valid @ModelAttribute Customer customer, BindingResult result, @PathVariable Long id){
+    public ResponseEntity<?> updateUser(@RequestParam("file") Optional<MultipartFile> file,
+                                        @Valid @ModelAttribute CustomerUpdateRequest customer, BindingResult result,
+                                        @PathVariable Long id){
         if(result.hasErrors()){
             return validateRequest(result);
         }
-        Optional<Customer> c = service.findById(id);
-        if(c.isPresent()){
-            Customer dbCustomer = c.get();
-            dbCustomer.setName(customer.getName());
-            dbCustomer.setSurname(customer.getSurname());
-            dbCustomer.setPhotoUrl(customer.getPhotoUrl());
-            return ResponseEntity.status(HttpStatus.CREATED).body(service.save(dbCustomer));
+        try{
+            Optional<Customer> c = service.findById(id);
+            if(c.isPresent()){
+                Customer dbCustomer = c.get();
+                dbCustomer.setName(customer.getName() != null ? customer.getName() : dbCustomer.getName());
+                dbCustomer.setSurname(customer.getSurname() != null ? customer.getSurname() : dbCustomer.getSurname());
+                if(file.isPresent())
+                    dbCustomer.setPhotoUrl(service.savePhoto(file.get()));
+                dbCustomer.setUpdatedBy(customer.getUpdatedBy());
+                return ResponseEntity.status(HttpStatus.CREATED).body(service.save(dbCustomer));
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(false, "User not found!"));
         }
-        return ResponseEntity.notFound().build();
+        catch (Exception e){
+            // maybe put sentry here
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "Exception "+e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -92,9 +98,9 @@ public class CustomerController {
         Optional<Customer> c = service.findById(id);
         if(c.isPresent()){
             service.delete(id);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok(new ApiResponse(true, "User deleted!"));
         }
-        return  ResponseEntity.notFound().build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(false, "User not found!"));
     }
 
     private ResponseEntity<Map<String, String>> validateRequest(BindingResult result) {

@@ -1,44 +1,23 @@
-package org.agile.monkeys.msvc.java.api.customers.msvcjavaapicustomers.models.entity;
+package org.agile.monkeys.msvc.java.api.customers.msvcjavaapicustomers.models.dto;
 
-import javax.persistence.*;
+import javax.persistence.Column;
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@Entity
-@Table(name = "customers")
-public class Customer {
+public class CustomerUpdateRequest {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
-
-    @NotEmpty
     private String name;
 
-    @NotEmpty
     private String surname;
 
-    @Column(name = "photo_url")
     private String photoUrl;
-
-    @NotNull
-    @Digits(integer = 11, fraction = 0)
-    @Column(name = "created_by", nullable = false)
-    private Long createdBy;
 
     @NotNull
     @Digits(integer = 11, fraction = 0)
     @Column(name = "updated_by", nullable = false)
     private Long updatedBy;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -62,14 +41,6 @@ public class Customer {
 
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
-    }
-
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
     }
 
     public Long getUpdatedBy() {
