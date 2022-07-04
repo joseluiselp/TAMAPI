@@ -15,8 +15,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class CustomerServiceImplementation implements CustomerService {
@@ -71,10 +74,10 @@ public class CustomerServiceImplementation implements CustomerService {
 
     @Override
     public String savePhoto(MultipartFile file) {
-        System.out.println(storage.toString());
         try {
             BlobInfo blobInfo = storage.create(
-                    BlobInfo.newBuilder("photos_tam", file.getOriginalFilename()).build(),
+                    BlobInfo.newBuilder("photos_tam",
+                            filenameGenerator()+'.'+file.getOriginalFilename().split("\\.")[1]).build(),
                     file.getBytes(),
                     Storage.BlobTargetOption.predefinedAcl(Storage.PredefinedAcl.PUBLIC_READ)
             );
@@ -84,5 +87,11 @@ public class CustomerServiceImplementation implements CustomerService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String filenameGenerator(){
+        Random random = new Random();
+        String date = new SimpleDateFormat("yyyyMMddHHmm").format(new Date());
+        return date + random.nextInt(1000);
     }
 }
