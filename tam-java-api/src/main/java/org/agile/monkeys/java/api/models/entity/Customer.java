@@ -25,12 +25,12 @@ public class Customer {
 
     @NotNull
     @Digits(integer = 11, fraction = 0)
-    @Column(name = "created_by", nullable = false)
+    @Column(name = "created_by")
     private Long createdBy;
 
     @NotNull
     @Digits(integer = 11, fraction = 0)
-    @Column(name = "updated_by", nullable = false)
+    @Column(name = "updated_by")
     private Long updatedBy;
 
     public Long getId() {

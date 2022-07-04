@@ -1,12 +1,15 @@
 package org.agile.monkeys.java.api.models.dto;
 
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-public class CustomerUpdateRequest {
+public class CustomerCreateRequest {
 
+    @NotEmpty
     private String name;
 
+    @NotEmpty
     private String surname;
 
     public String getName() {
