@@ -4,6 +4,7 @@ import org.agile.monkeys.java.api.models.entity.User;
 import org.agile.monkeys.java.api.services.CustomUserDetailsService;
 import org.agile.monkeys.java.api.models.dto.ApiResponse;
 import org.agile.monkeys.java.api.models.dto.UserRequest;
+import org.agile.monkeys.java.api.services.CustomerService;
 import org.agile.monkeys.java.api.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,8 @@ public class UserController {
 
     @Autowired
     private UserService service;
+    @Autowired
+    private CustomerService customerService;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -63,6 +66,10 @@ public class UserController {
         if(!service.findByEmail(principal.getName()).get().getIsAdmin()){
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponse(false, "Missing admin credentials"));
         }
+        Optional<User> u = service.findById(id);
+        if(!u.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(false, "User not found!"));
+        }
         Optional<User> found = service.findByEmail(user.getEmail());
         if(found.isPresent() && id != found.get().getId()) {
             result.rejectValue("email", "error.user", "An account already exists for this email.");
@@ -70,15 +77,11 @@ public class UserController {
         if(result.hasErrors()){
             return validateRequest(result);
         }
-        Optional<User> u = service.findById(id);
-        if(u.isPresent()){
-            User dbUser = u.get();
-            dbUser.setPassword(passwordEncoder.encode(user.getPassword()));
-            dbUser.setEmail(user.getEmail());
-            dbUser.setIsAdmin(user.getIsAdmin() == null ? false : user.getIsAdmin());
-            return ResponseEntity.status(HttpStatus.CREATED).body(service.save(dbUser));
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(false, "User not found!"));
+        User dbUser = u.get();
+        dbUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        dbUser.setEmail(user.getEmail());
+        dbUser.setIsAdmin(user.getIsAdmin() == null ? false : user.getIsAdmin());
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(dbUser));
     }
 
     @DeleteMapping("/{id}")
@@ -87,11 +90,13 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponse(false, "Missing admin credentials"));
         }
         Optional<User> u = service.findById(id);
-        if(u.isPresent()){
-            service.delete(id);
-            return ResponseEntity.ok(new ApiResponse(true, "User deleted!"));
+        if(!u.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(false, "User not found!"));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse(false, "User not found!"));
+        service.delete(id);
+        //Don't want to reference a user that doesn't exist
+        customerService.nullifyUser(id);
+        return ResponseEntity.ok(new ApiResponse(true, "User deleted!"));
     }
 
     private ResponseEntity<Map<String, String>> validateRequest(BindingResult result) {

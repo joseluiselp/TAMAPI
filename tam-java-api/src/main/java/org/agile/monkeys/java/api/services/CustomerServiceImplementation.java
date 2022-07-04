@@ -10,6 +10,7 @@ import org.agile.monkeys.java.api.models.entity.Customer;
 import org.agile.monkeys.java.api.repositories.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -59,6 +60,13 @@ public class CustomerServiceImplementation implements CustomerService {
     @Override
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void nullifyUser(Long id) {
+        repository.nullifyCreatedUser(id);
+        repository.nullifyUpdatedUser(id);
     }
 
     @Override

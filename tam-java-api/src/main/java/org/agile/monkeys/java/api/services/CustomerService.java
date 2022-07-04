@@ -11,5 +11,6 @@ public interface CustomerService {
     Optional<Customer> findById(Long id);
     Customer save(Customer customer);
     void delete(Long id);
+    void nullifyUser(Long id);
     String savePhoto(MultipartFile photo);
 }

@@ -23,12 +23,10 @@ public class Customer {
     @Column(name = "photo_url")
     private String photoUrl;
 
-    @NotNull
     @Digits(integer = 11, fraction = 0)
     @Column(name = "created_by")
     private Long createdBy;
 
-    @NotNull
     @Digits(integer = 11, fraction = 0)
     @Column(name = "updated_by")
     private Long updatedBy;
