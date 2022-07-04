@@ -19,16 +19,18 @@ TAMAPI is a simple User/Customer API based on Springboot, Admin users can manage
   cd TAMAPI
 ```
 
-Then, Go to `\tam-java-api\src\main\resources` and paste the GCP json key there, also in that same folder configure your database connection params
+Then, Go to `\tam-java-api\src\main\resources` and paste the GCP json key there, also in that same folder configure your database connection params in `application.properties`
 
 ```bash
 server.port=YOUR_PORT
-spring.datasource.url=jdbc:postgresql://localhost:5434/YOUR_DB_NAME
+spring.datasource.url=jdbc:postgresql://localhost:YOUR_DB_PORT/YOUR_DB_NAME
 spring.datasource.username=YOUR_DB_USER
 spring.datasource.password=YOUR_DB_PASSWORD
 ```
 
-After that you can use maven to download all dependencies needed.
+Then, If your don't have access to the original bucket, Go to `\tam-java-api\src\main\java\...\config\SecurityConfigurer` and update the bucket name and the .json filename from resources
+
+Remember to download all dependencies using maven.
     
 # Usage/Examples
 
