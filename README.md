@@ -1,5 +1,5 @@
 
-# Project Title
+# TAMAPI
 
 TAMAPI is a simple User/Customer API based on Springboot, Admin users can manage other users and normal users can manage customers
 
